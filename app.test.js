@@ -4,5 +4,5 @@ const { statement } = require("./app");
 
 test("first", () => {
   console.log(statement);
-  statement(invoices, plays);
+  statement(invoices[0], plays);
 });
