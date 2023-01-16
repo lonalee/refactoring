@@ -59,6 +59,7 @@ function statement(invoice, plays) {
     return result;
   }
 
+  // 공연별 세부 내역을 연산하는 함수
   function enrichPerformance(aPerformance) {
     const result = Object.assign({}, aPerformance); // 얕은 복사 수행
     result.play = playFor(result);
@@ -79,6 +80,8 @@ function statement(invoice, plays) {
  * 3. 연극제목도 옮긴다.
  * 4. playFor / amountFor / 적립포인트 계산 함수
  * 5. 총합 계산 부분을 옮긴다. 
+ * 5-1. enrichPerformance에서 공연별 세부 내역을 계산한다. 따라서 누적 변수를 정의하고 이 함수가 호출될 때마다 amount를 누적할 수 있다.
+ * 5-2. 
  * */
 
 /**
