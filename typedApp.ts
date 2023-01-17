@@ -7,7 +7,7 @@ interface Performance {
 }
 
 interface Play {
-  any: {
+  [key:string]: {
     name: string;
     type: string;
   };
