@@ -19,10 +19,7 @@ interface Play {
 
 export function amountFor(perf: Performance) {
   let result = 0;
-  // console.log('play매개변수를 바꾸기 전', play);
-  // play 매개변수 제거
-
-  // console.log('playFor 함수 값으로 치환한다면 ', playFor(perf));
+  // play 매개변수 제거, playFor 함수 추출
   switch (playFor(perf).type) {
     case 'tragedy':
       result = 40000;
@@ -48,15 +45,22 @@ export function playFor(perf: Performance) {
   return play;
 }
 
+/**
+ * @description format메소드를 변수에 할당하던 것을 함수로 추출
+ * @param amount 형식을 지정할 금액
+ */
+export function formatting(amount: number) {
+  return new Intl.NumberFormat('krw-KR', {
+    style: 'currency',
+    currency: 'KRW',
+    // minimumFractionDigits: 2,
+  }).format(amount);
+}
+
 export function statement() {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `청구 내역 (고객명: ${invoice.customer})\n`;
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
 
   for (let perf of invoice.performances) {
     // switch -> amountFor (refactored)
@@ -66,12 +70,12 @@ export function statement() {
     if (playFor(perf).type === 'comedy')
       volumeCredits += Math.floor(perf.audience / 5);
 
-    result += `${playFor(perf).name} : ${format(thisAmount / 100)} (${
+    result += `${playFor(perf).name} : ${formatting(thisAmount)} (${
       perf.audience
     }석)\n`;
     totalAmount += thisAmount;
   }
   result += `적립포인트 : ${volumeCredits}\n`;
-  result += `총액 : ${format(totalAmount / 100)}`;
+  result += `총액 : ${formatting(totalAmount)}`;
   return result;
 }
