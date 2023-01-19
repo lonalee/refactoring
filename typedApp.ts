@@ -57,25 +57,72 @@ export function formatting(amount: number) {
   }).format(amount);
 }
 
-export function statement() {
-  let totalAmount = 0;
+/**
+ * @description 공연별 크레딧 누적
+ * @param credits
+ */
+export function getVolumeCredits(perf: Performance) {
+  let result = 0;
+  result = Math.max(perf.audience - 30, 0);
+  if (playFor(perf).type === 'comedy') {
+    result += Math.floor(perf.audience / 5);
+  }
+  return result;
+}
+
+/**
+ * @returns 최종 크레딧
+ */
+export function getTotalVolumeCredits() {
   let volumeCredits = 0;
-  let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+  invoice.performances.forEach((perf) => {
+    volumeCredits += getVolumeCredits(perf);
+  });
+  return volumeCredits;
+}
 
-  for (let perf of invoice.performances) {
-    // switch -> amountFor (refactored)
-    const thisAmount = amountFor(perf, playFor(perf));
+/**
+ * @returns 최종 합계
+ */
+export function getTotalAmount() {
+  let result = 0;
+  invoice.performances.forEach((perf) => {
+    result += amountFor(perf);
+  });
+  return result;
+}
 
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    if (playFor(perf).type === 'comedy')
-      volumeCredits += Math.floor(perf.audience / 5);
+interface StatementData {
+  customer:string
+  performances: {}[]
+}
 
-    result += `${playFor(perf).name} : ${formatting(thisAmount)} (${
+export function renderPlainText(statementData:StatementData) {
+  let result = `청구 내역 (고객명: ${statementData.customer})\n`;
+  // 공연별 비용을 계산해서 문자열로 만드는 로직
+  invoice.performances.forEach((perf) => {
+    result += `${playFor(perf).name} : ${formatting(amountFor(perf))} (${
       perf.audience
     }석)\n`;
-    totalAmount += thisAmount;
-  }
-  result += `적립포인트 : ${volumeCredits}\n`;
-  result += `총액 : ${formatting(totalAmount)}`;
+  });
+
+  result += `적립포인트 : ${getTotalVolumeCredits()}\n`;
+  result += `총액 : ${formatting(getTotalAmount())}`;
   return result;
+}
+
+export function enrichPerformance(perf:Performance) {
+  const result = Object.assign({}, perf)
+  return result
+}
+
+export function statement() {
+  const statementData:StatementData = {
+    customer:'',
+    performances: []
+  }
+  statementData.customer = invoice.customer
+  statementData.performances = invoice.performances.map(enrichPerformance)
+
+  return renderPlainText(statementData);
 }

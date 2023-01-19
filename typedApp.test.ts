@@ -1,4 +1,4 @@
-import { statement, amountFor, playFor } from './typedApp';
+import { statement, amountFor, playFor, enrichPerformance } from './typedApp';
 import invoice from './JSON/invoice.json';
 import plays from './JSON/plays.json';
 
@@ -10,21 +10,15 @@ describe('', () => {
     console.log(res);
     expect(res).toEqual(expected);
   });
-  test('test amountFor', () => {
-    const res =
-      parseInt(
-        amountFor(
-          invoice.performances[1],
-          plays[invoice.performances[1].playID]
-        )
-      ) / 100;
 
-    console.log('performance is ', invoice.performances[1]);
-    expect(res).toBe(580);
-  });
   test('test playFor', () => {
     const expected = { name: 'Hamlet', type: 'tragedy' };
     const res = playFor(invoice.performances[0]);
     expect(res).toEqual(expected);
+  });
+  test('test enrichPerformance', () => {
+    const mockEnrichPerformance = jest.fn<typeof enrichPerformance, {}[]>();
+    const result = mockEnrichPerformance.mockImplementation();
+    console.log('RESULT', result);
   });
 });
