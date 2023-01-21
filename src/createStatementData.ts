@@ -1,7 +1,7 @@
 import invoice from '../JSON/invoice.json'
 import { formatting,getTotalVolumeCredits, getTotalAmount,enrichPerformance } from './typedApp'
 
-interface StatementData {
+export interface StatementData {
     customer: string
     performances: {}[],
     totalAmount: string,
