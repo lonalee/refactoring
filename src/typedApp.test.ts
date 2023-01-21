@@ -1,4 +1,5 @@
-import { statement, amountFor, playFor, enrichPerformance } from './typedApp';
+import { statement } from './typedApp';
+import { playFor } from './createStatementData';
 import invoice from '../JSON/invoice.json';
 import plays from '../JSON/plays.json';
 
