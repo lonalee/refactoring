@@ -1,5 +1,6 @@
-import invoice from './JSON/invoice.json';
-import plays from './JSON/plays.json';
+import invoice from '../JSON/invoice.json';
+import plays from '../JSON/plays.json';
+import { createStatementData, StatementData } from './createStatementData';
 
 interface Performance {
   playID: string;
@@ -92,37 +93,28 @@ export function getTotalAmount() {
   return result;
 }
 
-interface StatementData {
-  customer:string
-  performances: {}[]
-}
 
-export function renderPlainText(statementData:StatementData) {
+export function renderPlainText(statementData: StatementData) {
   let result = `청구 내역 (고객명: ${statementData.customer})\n`;
   // 공연별 비용을 계산해서 문자열로 만드는 로직
   invoice.performances.forEach((perf) => {
-    result += `${playFor(perf).name} : ${formatting(amountFor(perf))} (${
-      perf.audience
-    }석)\n`;
+    result += `${playFor(perf).name} : ${formatting(amountFor(perf))} (${perf.audience
+      }석)\n`;
   });
 
-  result += `적립포인트 : ${getTotalVolumeCredits()}\n`;
-  result += `총액 : ${formatting(getTotalAmount())}`;
+  // result += `적립포인트 : ${getTotalVolumeCredits()}\n`;
+  result += `적립포인트 : ${statementData.totalVolumeCredits}\n`;
+  // result += `총액 : ${formatting(getTotalAmount())}`;
+  result += `총액 : ${statementData.totalAmount}`;
   return result;
 }
 
-export function enrichPerformance(perf:Performance) {
+export function enrichPerformance(perf: Performance) {
   const result = Object.assign({}, perf)
   return result
 }
 
-export function statement() {
-  const statementData:StatementData = {
-    customer:'',
-    performances: []
-  }
-  statementData.customer = invoice.customer
-  statementData.performances = invoice.performances.map(enrichPerformance)
 
-  return renderPlainText(statementData);
+export function statement() {
+  return renderPlainText(createStatementData());
 }

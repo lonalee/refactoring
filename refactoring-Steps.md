@@ -47,3 +47,6 @@ const thisAmount = amountFor(perf, playFor(perf));
 ```
 
 ``함수 amountFor``에서도 playFor 함수를 이용하여 변수를 인라인 처리할 수 있고, 전달되는 매개변수 갯수도 줄일 수 있다.
+
+#### renderPlainText & createStatementData 분리
+- 출력 + 계산으로 각각 분리
