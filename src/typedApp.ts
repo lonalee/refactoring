@@ -1,14 +1,5 @@
 import { createStatementData, StatementData } from './createStatementData';
 
-
-// interface Play {
-//   [key: string]: {
-//     name: string;
-//     type: string;
-//   };
-// }
-
-
 /**
  * @description format메소드를 변수에 할당하던 것을 함수로 추출
  * @param amount 형식을 지정할 금액
