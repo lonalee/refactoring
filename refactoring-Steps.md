@@ -1,4 +1,4 @@
-### Steps
+## A Steps
 
 #### 1. switch문 추출 (함수 추출하기 - 6.1)
 for문 전체를 추출하려고 생각했으나, 함수가 하는 일을 최대한 명확하게 만들기 위한 목적으로 for문은 그대로 유지하고 내부 로직만을 추출한다. 
@@ -48,5 +48,40 @@ const thisAmount = amountFor(perf, playFor(perf));
 
 ``함수 amountFor``에서도 playFor 함수를 이용하여 변수를 인라인 처리할 수 있고, 전달되는 매개변수 갯수도 줄일 수 있다.
 
-#### renderPlainText & createStatementData 분리
-- 출력 + 계산으로 각각 분리
+#### 3. volumCredits 계산 코드 추출하기
+#### 4. format 함수로 추출하기
+#### 5. volumCredits 누적 코드 함수로 추출하기
+적립포인트 계산만을 위한 루프 추가 -> <br>
+바로 파이프라인으로 작성 + "문장 슬라이드 하기" 적용 -> <br>
+해당 로직을 별도 함수로 추출 (getTotalVolumeCredits)
+
+#### 6. totalAmount
+위 순서와 유사하다.
+
+## B Steps
+#### 1. 계산 단계와 포맷팅 단계를 분리
+#### 2. 중간 매개체 생성 (statementData)
+2-1. 고객정보 옮기기  
+2-2. 공연정보 옮기기
+#### 3. 공연료 계산기 만들기
+3-1. **enrichPerformance** -> amountFor(), volumeCreditsFor()  
+3-2. **amountFor(), volumeCreditsFor()**, 이 두 함수를 전용 ***클래스***로 옮긴다. 
+```
+const calculator = new PerformanceCalculator(perf)
+```
+3-3. 기존 함수에서 몇 가지 동작을 클래스로 옮겨본다. (메소드화)  
+3-3-a. 공연료 계산 코드 (amountFor함수)를 클래스 안으로 이동  
+- getter로 메소드 정의 **?** --> get amount는 클래스로 인스턴스 생성 시 계산되어서 일반적인 프로터티와 동일하게 접근한다. (not callable)
+```
+public get amount() : string|number {
+  ...
+}
+...
+function amountFor(perf) {
+  return new PerformanceCalculator(perf,playFor(perf)).amount 
+  // 메소드 리턴
+}
+```
+
+3-4. 공연료 계산기를 다형성 버전으로 만들기
+3-4-a. 서브클래스 생성

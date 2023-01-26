@@ -36,15 +36,74 @@ export function createStatementData() {
   return statementData;
 }
 
+/**
+ * @description 계산기 클래스
+ */
+class PerformanceCalculator {
+  performance: { audience: number };
+  play: { type: string; name: string };
+
+  constructor(
+    perf: { playID: string; audience: number },
+    aPlay: { type: string; name: string }
+  ) {
+    this.performance = perf;
+    this.play = aPlay;
+  }
+  public get amount(): number | string {
+    let result: number | string;
+
+    switch (this.play.type) {
+      case 'tragedy':
+        result = 40000;
+        if (this.performance.audience > 30) {
+          result += 1000 * (this.performance.audience - 30);
+        }
+        break;
+      case 'comedy':
+        result = 30000;
+        if (this.performance.audience > 20) {
+          result += 10000 + 500 * (this.performance.audience - 20);
+        }
+        result += 300 * this.performance.audience;
+        break;
+      default:
+        throw new Error(`Unknown Genre ${this.play.type}`);
+    }
+    return result;
+  }
+
+  public get volumeCredits(): number {
+    let result = 0;
+    result = Math.max(this.performance.audience - 30, 0);
+    if (this.play.type === 'comedy') {
+      result += Math.floor(this.performance.audience / 5);
+    }
+    return result;
+  }
+}
+
 export function enrichPerformance(perf: { playID: string; audience: number }) {
-  const result = Object.assign(
+  const calculator = new PerformanceCalculator(perf, playFor(perf));
+
+  const result: {
+    play: { name: string; type: string };
+    amount: number | string;
+    volumeCredits: number;
+  } = Object.assign(
     { play: { name: '', type: '' }, amount: 0, volumeCredits: 0 },
     perf
   );
 
-  result.play = playFor(result);
-  result.amount = amountFor(result);
-  result.volumeCredits = volumeCreditsFor(result);
+  //   result.play = playFor(result);
+  //   result.amount = amountFor(result);
+  // ------변환--------->
+  result.play = calculator.play;
+  result.amount = calculator.amount;
+
+  //   result.volumeCredits = volumeCreditsFor(result);
+  // --------변환-------->
+  result.volumeCredits = calculator.volumeCredits;
 
   return result;
 }
@@ -54,38 +113,7 @@ export function playFor(perf: Performance) {
 }
 
 export function amountFor(perf: Performance) {
-  let result = 0;
-
-  switch (perf.play.type) {
-    case 'tragedy':
-      result = 40000;
-      if (perf.audience > 30) {
-        result += 1000 * (perf.audience - 30);
-      }
-      break;
-    case 'comedy':
-      result = 30000;
-      if (perf.audience > 20) {
-        result += 10000 + 500 * (perf.audience - 20);
-      }
-      result += 300 * perf.audience;
-      break;
-    default:
-      throw new Error(`Unknown Genre ${perf.play.type}`);
-  }
-  return result;
-}
-/**
- * @description 공연별 크레딧 누적
- * @param credits
- */
-export function volumeCreditsFor(perf: Performance) {
-  let result = 0;
-  result = Math.max(perf.audience - 30, 0);
-  if (perf.play.type === 'comedy') {
-    result += Math.floor(perf.audience / 5);
-  }
-  return result;
+  return new PerformanceCalculator(perf, playFor(perf)).amount;
 }
 
 /**
