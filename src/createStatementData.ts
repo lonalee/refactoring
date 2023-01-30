@@ -40,7 +40,7 @@ export function createStatementData() {
  * @description 계산기 클래스
  */
 class PerformanceCalculator {
-  performance: { audience: number };
+  performance: { playID: string; audience: number };
   play: { type: string; name: string };
 
   constructor(
@@ -50,28 +50,7 @@ class PerformanceCalculator {
     this.performance = perf;
     this.play = aPlay;
   }
-  public get amount(): number | string {
-    let result: number | string;
-
-    switch (this.play.type) {
-      case 'tragedy':
-        result = 40000;
-        if (this.performance.audience > 30) {
-          result += 1000 * (this.performance.audience - 30);
-        }
-        break;
-      case 'comedy':
-        result = 30000;
-        if (this.performance.audience > 20) {
-          result += 10000 + 500 * (this.performance.audience - 20);
-        }
-        result += 300 * this.performance.audience;
-        break;
-      default:
-        throw new Error(`Unknown Genre ${this.play.type}`);
-    }
-    return result;
-  }
+  // amount 메소드 삭제
 
   public get volumeCredits(): number {
     let result = 0;
@@ -83,8 +62,54 @@ class PerformanceCalculator {
   }
 }
 
+class tragedyCalculator extends PerformanceCalculator {
+  // 서브클래스 -> constructor 필요 없음
+  public get amount(): number {
+    let result = 40000;
+    if (this.performance.audience > 30) {
+      result += 1000 * (this.performance.audience - 30);
+    }
+    return result;
+  }
+}
+class comedyCalculator extends PerformanceCalculator {
+  // 서브클래스 -> constructor 필요 없음
+  public get amount(): number {
+    let result = 30000;
+    if (this.performance.audience > 20) {
+      result += 10000 + 500 * (this.performance.audience - 20);
+    }
+    result += 300 * this.performance.audience;
+    return result;
+  }
+}
+
+/**
+ * @description 팩토리 함수의 추가 (생성자 클래스-PerformanceCalculator-를 호출한다) 기존의 클래스는 서브클래스 2개로 확장된다. (...extends...)
+ */
+function createPerformanceCalculator(
+  performance: InvoicePerformance,
+  play: { type: string; name: string }
+) {
+  // return new PerformanceCalculator(performance, play)
+  /**
+   * 1.분기 로직 이동
+   * 2.케이스에 따라 서브클래스 인스턴스 생성
+   * */
+
+  switch (play.type) {
+    case 'tragedy':
+      return new tragedyCalculator(performance, play);
+    case 'comedy':
+      return new comedyCalculator(performance, play);
+    default:
+      throw new Error(`Unknown Genre ${play.type}`);
+  }
+}
+
 export function enrichPerformance(perf: { playID: string; audience: number }) {
-  const calculator = new PerformanceCalculator(perf, playFor(perf));
+  const calculator = createPerformanceCalculator(perf, playFor(perf));
+  // const calculator = new PerformanceCalculator(perf, playFor(perf));
 
   const result: {
     play: { name: string; type: string };
