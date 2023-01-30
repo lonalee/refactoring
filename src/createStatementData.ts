@@ -7,7 +7,7 @@ export interface StatementData {
     playID: string;
     play: { name: string; type: string };
     audience: number;
-    amount: number;
+    amount: number | string;
     volumeCredits: number;
   }[];
   totalAmount: number;
@@ -90,25 +90,26 @@ export function enrichPerformance(perf: { playID: string; audience: number }) {
     play: { name: string; type: string };
     amount: number | string;
     volumeCredits: number;
+    playID: string;
+    audience: number;
   } = Object.assign(
     { play: { name: '', type: '' }, amount: 0, volumeCredits: 0 },
     perf
   );
 
-  //   result.play = playFor(result);
-  //   result.amount = amountFor(result);
-  // ------변환--------->
   result.play = calculator.play;
   result.amount = calculator.amount;
-
-  //   result.volumeCredits = volumeCreditsFor(result);
-  // --------변환-------->
   result.volumeCredits = calculator.volumeCredits;
 
   return result;
 }
 
-export function playFor(perf: Performance) {
+interface InvoicePerformance {
+  playID: string;
+  audience: number;
+}
+
+export function playFor(perf: InvoicePerformance) {
   return plays[perf.playID];
 }
 
@@ -121,7 +122,10 @@ export function amountFor(perf: Performance) {
  */
 export function totalAmount(data: StatementData) {
   return data.performances.reduce(
-    (total: number, { amount }: { amount: number }) => total + amount,
+    (total: number, { amount }: { amount: number | string }) => {
+      if (typeof amount === 'string') return total + 0;
+      return total + amount;
+    },
     0
   );
 }
