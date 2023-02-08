@@ -1,4 +1,4 @@
-function sampleProvinceData() {
+export function sampleProvinceData() {
   return {
     name: 'Asia',
     producers: [
@@ -11,21 +11,21 @@ function sampleProvinceData() {
   };
 }
 
-interface Province {
+export interface Province {
   _name: string;
   _producers: string[];
   _totalProduction: number;
   _demand: number;
   _price: number;
-  _demandValue: number;
-  _demandCost: number;
-  _satisfiedDemand: number;
+  // _demandValue: number;
+  // _demandCost: number;
+  // _satisfiedDemand: number;
 }
 
-class Province {
-  constructor(doc) {
-    this._name = doc.name;
-    this._producers = [];
+export class Province {
+  constructor(doc) { // 테스트1. doc === sampleProvinceData
+    this._name = doc.name; // asia
+    this._producers = []; // 
     this._totalProduction = 0;
     this._demand = doc.demand;
     this._price = doc.price;
@@ -33,6 +33,7 @@ class Province {
   }
 
   addProducer(arg) {
+    // console.log('chk flow1: arg --> ', arg)
     this._producers.push(arg);
     this._totalProduction += arg.production;
   }
@@ -69,22 +70,31 @@ class Province {
 
   // 수익 계산
   get profit() {
-    return this._demandValue - this._demandCost;
+    return this.demandValue - this.demandCost;
   }
   get demandValue() {
-    return this._satisfiedDemand * this._price;
+    return this.satisfiedDemand * this._price;
   }
   get satisfiedDemand() {
     return Math.min(this._demand, this.totalProduction);
   }
   get demandCost() {
     let remainingDemand = this._demand;
+    console.log('flow1 : remainingDemand -->', remainingDemand)
     let result = 0;
 
     type producers = {
       cost: number;
     };
-    this.producers.sort((a, b) => a.cost - b.cost);
+    this.producers.sort((a, b) => a.cost - b.cost).forEach(p => {
+      const contribution = Math.min(remainingDemand, p.production)
+      console.log('flow1 : contribution -->', contribution)
+      remainingDemand -= contribution //TODO: "-" 기호의 위치에 따른 값 변화 확인해보기
+      console.log('flow1 : contribution -->', contribution)
+      result += contribution* p.cost
+      console.log('flow3 : contribution -->', result)
+    })
+    return result
   }
 }
 
@@ -96,10 +106,10 @@ interface Producers {
 }
 
 class Producers {
-  constructor(aProvince, data) {
+  constructor(aProvince, data) { //aProvince는 Asia 전체, data는 producers배열의 요소 예. Byzantium
     this._province = aProvince;
-    this._cost = data.cost;
     this._name = data.name;
+    this._cost = data.cost;
     this._production = data.production || 0;
   }
 
