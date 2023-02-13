@@ -18,8 +18,24 @@ describe('test Province', () => {
     // demandValue - demandCost
     
     // expect(asia.profit).toEqual(500)
-    expect(asia.demandValue).toEqual(500)
+    // console.log('---asia---', asia)
+    // console.log('---satisfiedDemand ===', asia.satisfiedDemand)
+    expect(asia.satisfiedDemand).toBe(25)
+    
+    expect(asia.demandValue).toBe(500)
+    
+    expect(asia.demandCost).toBe(270)
+    
+    expect(asia.profit).toBe(230)
+  })
+  it('change production', () => {
+    
+    expect(asia.producers[0].production).toBe(9)
 
-    expect(asia.demandCost).toEqual(500)
+    asia.producers[0].production = 20
+
+    expect(asia.shortFall).toBe(-6)
+    
+    expect(asia.profit).toBe(292)
   })
 });

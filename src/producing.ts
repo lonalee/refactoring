@@ -17,9 +17,6 @@ export interface Province {
   _totalProduction: number;
   _demand: number;
   _price: number;
-  // _demandValue: number;
-  // _demandCost: number;
-  // _satisfiedDemand: number;
 }
 
 export class Province {
@@ -33,7 +30,7 @@ export class Province {
   }
 
   addProducer(arg) {
-    // console.log('chk flow1: arg --> ', arg)
+    
     this._producers.push(arg);
     this._totalProduction += arg.production;
   }
@@ -80,7 +77,7 @@ export class Province {
   }
   get demandCost() {
     let remainingDemand = this._demand;
-    console.log('flow1 : remainingDemand -->', remainingDemand)
+    
     let result = 0;
 
     type producers = {
@@ -88,11 +85,10 @@ export class Province {
     };
     this.producers.sort((a, b) => a.cost - b.cost).forEach(p => {
       const contribution = Math.min(remainingDemand, p.production)
-      console.log('flow1 : contribution -->', contribution)
+      
       remainingDemand -= contribution //TODO: "-" 기호의 위치에 따른 값 변화 확인해보기
-      console.log('flow1 : contribution -->', contribution)
+      
       result += contribution* p.cost
-      console.log('flow3 : contribution -->', result)
     })
     return result
   }
@@ -126,6 +122,7 @@ class Producers {
     return this._production;
   }
   set production(amountStr: string) {
+    console.log('amountStr -->', amountStr)
     const amount = parseInt(amountStr);
     const newProduction = Number.isNaN(amount) ? 0 : amount;
     this._province.totalProduction += newProduction - this._production;
